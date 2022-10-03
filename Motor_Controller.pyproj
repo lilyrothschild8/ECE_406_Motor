@@ -5,7 +5,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{52f887cf-721a-4413-8d32-fd0e07760171}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>Motor_Driver.pyw</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -18,9 +19,6 @@
   <PropertyGroup>
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="Motor_Driver.pyw" />
-  </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.10" />
   </ItemGroup>
