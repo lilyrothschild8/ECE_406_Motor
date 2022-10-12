@@ -79,6 +79,6 @@ while True:
     #we know that the diameter of the 16 tooth belt pulley is 0.200" the radious is then .100"/10 = 0.01"
     #with (200 * 12)/0.01 = 240000 steps/ft or 20000 steps/inch
     #due to calculations Max spped = 10, Min speed = 600 dont use anything slower for better stability
-    forward(10,20000)
+    forward(10,20000,DIR,PUL)
 
 GPIO.cleanup()
