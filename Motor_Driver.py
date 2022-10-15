@@ -80,5 +80,21 @@ while True:
     #with (200 * 12)/0.01 = 240000 steps/ft or 20000 steps/inch
     #due to calculations Max spped = 10, Min speed = 600 dont use anything slower for better stability
     forward(100,20000,DIR,PUL)
+    for y in range(distance):
+        GPIO.output(PUL, GPIO.HIGH)
+        sleep(speed)
+        GPIO.output(PUL, GPIO.LOW)
+        sleep(speed)
+        rotation = (rotation + 1)
+    GPIO.output(Enable, GPIO.LOW)
+    #
+    print('Enable set to LOW - Controller Disabled')
+    sleep(.5) # pause for possible change direction
+    print('running in counter clock-wise')
+    return rotation
+
+def stopMotor():
+    GPIO.output(Enable, GPIO.LOW)
+    print('Enable set to LOW - Controller Enabled')
 
 GPIO.cleanup()

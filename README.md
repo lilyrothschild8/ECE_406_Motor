@@ -1,2 +1,2 @@
 # ECE_406_Motor
-The Python code required for handling the motor movement for the Ford Water Meter company's water meter testing station.
+The Python code required for handling nema 17 motor with tb6600 motor driver using pyton abd arduino.
