@@ -10,8 +10,8 @@ import RPi.GPIO as GPIO
 PUL = 17  # Stepper Drive Pulses
 DIR = 27  # Controller Direction port (High for Controller default / LOW to Force a Direction Change).
 Enable = 22  # The enable port
-dTT = 0; # the distance to travel
-rotation = 0; # rotations completed
+dTT = 0 # the distance to travel
+rotation = 0 # rotations completed
 # NOTE: Leave DIR and ENA disconnected, and the controller WILL drive the motor in Default direction if PUL is applied.
 #
 GPIO.setmode(GPIO.BCM)
@@ -25,8 +25,8 @@ GPIO.setup(Enable, GPIO.OUT)
 print('ENA = GPIO 22')
 #
 #
-GPIO.output(Enable, GPIO.LOW); #for enable LOW == Enabled, HIGH = disabled.
-print("Enable set to LOW - Controller Enabled");
+GPIO.output(Enable, GPIO.LOW) #for enable LOW == Enabled, HIGH = disabled.
+print("Enable set to LOW - Controller Enabled")
 print('Ready')
 #
 #
