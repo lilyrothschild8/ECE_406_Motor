@@ -10,7 +10,7 @@ import RPi.GPIO as GPIO
 PUL = 17  # Stepper Drive Pulses
 DIR = 27  # Controller Direction port (High for Controller default / LOW to Force a Direction Change).
 Enable = 22  # The enable port
-dTT =0; # the distance to travel
+dTT = 0; # the distance to travel
 rotation = 0; # rotations completed
 # NOTE: Leave DIR and ENA disconnected, and the controller WILL drive the motor in Default direction if PUL is applied.
 #
@@ -32,7 +32,7 @@ print('Ready')
 #
 def forward(speed, distance, direction, pull):
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
-    rotation++ # increment rotation
+    rotation+=1 # increment rotation
     dTT = distance # distance to travel is set to distance
 
     GPIO.output(direction, GPIO.HIGH)# set rotation clock-wise
@@ -46,12 +46,12 @@ def forward(speed, distance, direction, pull):
     if rotation == dTT:
         stopMotor() # stops the motor and prints note
         sleep(1) # delay 1n milisecond for stability
-    return
+     
 #
 #
 def reverse(speed, distance,direction, pull):
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
-    rotation++ # increment rotation
+    rotation+=1 # increment rotation
     dTT = distance # distance to travel is set to distance
 
     GPIO.output(direction, GPIO.LOW)# set rotation counter clock-wise
@@ -65,12 +65,13 @@ def reverse(speed, distance,direction, pull):
     if rotation == dTT:
         stopMotor() # stops the motor and prints note
         sleep(1) # delay 1n milisecond for stability
-    return
+     
 #
 #
 def stopMotor():
     GPIO.output(Enable, GPIO.HIGH) # Disable the motor
-    print('Enable set to LOW - Controller Disabled')
+    rotation = dTT = 0
+    print('Enable set to HIGH - Controller Disabled')
 #
 #
 # this is the same as a loop function it is here just for test pouposes, comment it out if importing this library...
@@ -80,21 +81,5 @@ while True:
     #with (200 * 12)/0.01 = 240000 steps/ft or 20000 steps/inch
     #due to calculations Max spped = 10, Min speed = 600 dont use anything slower for better stability
     forward(1000,20000,DIR,PUL)
-    for y in range(distance):
-        GPIO.output(PUL, GPIO.HIGH)
-        sleep(speed)
-        GPIO.output(PUL, GPIO.LOW)
-        sleep(speed)
-        rotation = (rotation + 1)
-    GPIO.output(Enable, GPIO.LOW)
-    #
-    print('Enable set to LOW - Controller Disabled')
-    sleep(.5) # pause for possible change direction
-    print('running in counter clock-wise')
-    return rotation
-
-def stopMotor():
-    GPIO.output(Enable, GPIO.LOW)
-    print('Enable set to LOW - Controller Enabled')
 
 GPIO.cleanup()
