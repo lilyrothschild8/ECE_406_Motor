@@ -44,41 +44,50 @@ while True:
     # approximately 8-12 hrs to complete
     # add your functions concurrent with mine to complete the automation proccess..i.e camera_driver functions
 
-    #b[0] = GPIO.input(b[0])
-    #b[1] = GPIO.input(b[1])
+    #limit_Switches[0] = GPIO.input(limit_Switches[0])
+    #limit_Switches[1] = GPIO.input(limit_Switches[1])
 
     # Home the test bench
     Nema.home_Machine(100,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],Motor_Pin[5],Motor_Pin[4],Motor_Pin[7],Motor_Pin[6],limit_Switches)
+    Nema.enable_Motor() # re-enable the motors
     # Set the camera location as homed
     c_X = 0
     c_Y = 0
     c_Z = 0
 
+
     # Move Z a camera zoom Length
     Nema.reverse(100,100,Motor_Pin[7],Motor_Pin[6],limit_Switches)
+    Nema.enable_Motor() # re-enable the motors
     # update the new location
     c_Z += 100
+
 
     # Move Y a camera Length
     for y in Water_Meter_Location_1:
         Nema.forward_2(100,Water_Meter_Location_1[y],Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches)
+        Nema.enable_Motor() # re-enable the motors
         # update the new location
+        
         c_Y += Water_Meter_Location_1[y]
 
         # use camera methods to get the camera reading so the program can continue, append it to a list
     
     # Move Z back a camera zoom Length
     Nema.forward(100,100,Motor_Pin[7],Motor_Pin[6],limit_Switches)
+    Nema.enable_Motor() # re-enable the motors
     # update the new location
     c_Z -= 100
 
     # Move X the camera to the front row
     Nema.forward(100,300,Motor_Pin[5],Motor_Pin[4],limit_Switches)
+    Nema.enable_Motor() # re-enable the motors
     # update the new location
     c_X += 300
 
     # Move Z a camera zoom Length
     Nema.reverse(100,100,Motor_Pin[7],Motor_Pin[6],limit_Switches)
+    Nema.enable_Motor() # re-enable the motors
     # update the new location
     c_Z += 100
 
@@ -87,6 +96,7 @@ while True:
     # Move Y back a camera Length
     for y in Water_Meter_Location_2:
         Nema.reverse_2(100,Water_Meter_Location_2[y],Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches)
+        Nema.enable_Motor() # re-enable the motors
         # update the new location
         c_Y += Water_Meter_Location_2[y]
 
@@ -94,6 +104,7 @@ while True:
         
     # Move Z back a camera zoom Length
     Nema.forward(100,100,Motor_Pin[7],Motor_Pin[6],limit_Switches)
+    Nema.enable_Motor() # re-enable the motors
     # update the new location
     c_Z -= 100
 

@@ -8,6 +8,10 @@ from time import sleep
 
 HOME = False
 
+small_Amount = 20
+medium_Amount = 100
+large_Amount = 200
+
 Camera_X = 0
 Camera_Y = 0
 Camera_Z = 0
