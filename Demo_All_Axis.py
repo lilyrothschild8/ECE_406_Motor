@@ -29,7 +29,6 @@ Nema.Camera_Y = c_Y = 0
 Nema.Camera_Z = c_Z = 0
 
 Motor_Pin = [17, 27, 5, 6, 20, 21, 23, 24, 22] # all the motor and enable pins you want initialized
-#limit_Switches = [4, 26, 19] # all the stop switch pins
 limit_Switches = [4, 26, 19] # all the stop switch pins pin 4 needs a resistor
 
 # use the set_GPIO_Out method to set up GIO outputs
