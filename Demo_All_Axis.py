@@ -40,8 +40,6 @@ Nema.set_GPIO_In(limit_Switches)
 #Set the 8th number in the motor_Pin array as the enable pin correspinding to the real world pin
 Nema.Enable = Motor_Pin[8]
 
-rotation = 0 # define rotation
-dTT = 0 # define distance to travel
 
 RUN = True
 
@@ -129,3 +127,4 @@ while RUN:
     RUN = False
     Nema.disable_Motor()
 #GPIO.cleanup()
+
