@@ -19,8 +19,8 @@ Nema.set_Up_Board()
 # Leave DIR+ and ENA+ disconnected, and the controller WILL drive the motor in Default direction if PUL is applied.
 
 # The test bench location informations 1st and 2nd row (2nd row is @ X = 300) i.e 1st row in back, 2nd in front
-Water_Meter_Location_1 = [100, 100, 100]
-Water_Meter_Location_2 = [100, 100, 100]
+Water_Meter_Location_1 = [1500, 1500, 1500]
+Water_Meter_Location_2 = [1500, 1500, 1500]
 
 meters_Per_Row = 3
 
@@ -29,7 +29,7 @@ Nema.Camera_Y = c_Y = 0
 Nema.Camera_Z = c_Z = 0
 
 Motor_Pin = [17, 27, 5, 6, 20, 21, 23, 24, 22] # all the motor and enable pins you want initialized
-limit_Switches = [26, 19, 1] # all the stop switch pins
+limit_Switches = [4, 26, 19] # all the stop switch pins pin 4 needs a resistor
 
 # use the set_GPIO_Out method to set up GIO outputs
 Nema.set_GPIO_Out(Motor_Pin)
@@ -40,21 +40,19 @@ Nema.set_GPIO_In(limit_Switches)
 #Set the 8th number in the motor_Pin array as the enable pin correspinding to the real world pin
 Nema.Enable = Motor_Pin[8]
 
-rotation = 0 # define rotation
-dTT = 0 # define distance to travel
-i = 0
-while True:
-    # due to calculations Max speed = ?1, Min speed = ?2 dont use anything slower or faster for better stability
+
+RUN = True
+
+while RUN:
+    # due to calculations Max speed = 600, Min speed = 900 dont use anything slower or faster for better stability
     # The demo will move the reader in an square fashion testing all the features, it will loop ?3 times taking
     # approximately 8-12 hrs to complete
     # add your functions concurrent with mine to complete the automation proccess..i.e camera_driver functions
-
-    limit_Switches[0] = GPIO.input(limit_Switches[0])
-    limit_Switches[1] = GPIO.input(limit_Switches[1])
+    
+    Nema.enable_Motor() # re-enable the motors
 
     # Home the test bench
-    Nema.home_Machine(100,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],Motor_Pin[5],Motor_Pin[4],Motor_Pin[7],Motor_Pin[6],limit_Switches)
-    Nema.enable_Motor() # re-enable the motors
+    Nema.home_Machine(600,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],Motor_Pin[5],Motor_Pin[4],Motor_Pin[7],Motor_Pin[6],limit_Switches)
     # Set the camera location as homed
     c_X = 0
     c_Y = 0
@@ -62,57 +60,71 @@ while True:
 
 
     # Move Z a camera zoom Length
-    Nema.reverse(100,100,Motor_Pin[7],Motor_Pin[6],limit_Switches)
-    Nema.enable_Motor() # re-enable the motors
+    Nema.reverse(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
+    #Nema.enable_Motor() # re-enable the motors
     # update the new location
-    c_Z += 100
+    c_Z += 3400
 
 
-    # Move Y a camera Length
+    # Move X a camera Length
     for y in range(meters_Per_Row):
-        Nema.forward_2(100,Water_Meter_Location_1[y],Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches)
-        Nema.enable_Motor() # re-enable the motors
+        Nema.reverse(900,Water_Meter_Location_1[y],Motor_Pin[5],Motor_Pin[4],limit_Switches[1])
+        #Nema.enable_Motor() # re-enable the motors
         # update the new location
 
-        c_Y += Water_Meter_Location_1[y]
+        c_X += Water_Meter_Location_1[y]
 
         # use camera methods to get the camera reading so the program can continue, append it to a list
 
     # Move Z back a camera zoom Length
-    Nema.forward(100,100,Motor_Pin[7],Motor_Pin[6],limit_Switches)
-    Nema.enable_Motor() # re-enable the motors
+    Nema.forward(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
+    #Nema.enable_Motor() # re-enable the motors
     # update the new location
-    c_Z -= 100
+    c_Z -= 3400
 
-    # Move X the camera to the front row
-    Nema.forward(100,300,Motor_Pin[5],Motor_Pin[4],limit_Switches)
-    Nema.enable_Motor() # re-enable the motors
+    # Move Y the camera to the front row
+    Nema.forward_2(600,2600,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches[2])
+    #Nema.enable_Motor() # re-enable the motors
     # update the new location
-    c_X += 300
+    c_Y += 2600
 
     # Move Z a camera zoom Length
-    Nema.reverse(100,100,Motor_Pin[7],Motor_Pin[6],limit_Switches)
-    Nema.enable_Motor() # re-enable the motors
+    Nema.reverse(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
+    #Nema.enable_Motor() # re-enable the motors
     # update the new location
-    c_Z += 100
+    c_Z += 3400
 
     # use camera methods to get the camera reading so the program can continue, append it to a list
 
-    # Move Y back a camera Length
+    # Move X back a camera Length
     for y in range(meters_Per_Row):
-        Nema.reverse_2(100,Water_Meter_Location_2[y],Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches)
-        Nema.enable_Motor() # re-enable the motors
+        Nema.forward(900,Water_Meter_Location_2[y],Motor_Pin[5],Motor_Pin[4],limit_Switches[1])
+        #Nema.enable_Motor() # re-enable the motors
         # update the new location
-        c_Y += Water_Meter_Location_2[y]
+        c_X += Water_Meter_Location_2[y]
 
-        # use camera methods to get the camera reading so the program can continue, append it to a list
+    # use camera methods to get the camera reading so the program can continue, append it to a list
 
     # Move Z back a camera zoom Length
-    Nema.forward(100,100,Motor_Pin[7],Motor_Pin[6],limit_Switches)
-    Nema.enable_Motor() # re-enable the motors
+    Nema.forward(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
+    #Nema.enable_Motor() # re-enable the motors
     # update the new location
-    c_Z -= 100
-
+    c_Z -= 3400
+    
+    # Move X back to orignal location
+    Nema.reverse(900,6500,Motor_Pin[5],Motor_Pin[4],limit_Switches[1])
+    #Nema.enable_Motor() # re-enable the motors
+    c_X -6500
+    
+    # Move Z back a camera zoom Length
+    Nema.reverse(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
+    #Nema.enable_Motor() # re-enable the motors
+    # update the new location
+    c_Z -= 3400
+    
     sleep(0.05)
-
+    
+    RUN = False
+    Nema.disable_Motor()
 #GPIO.cleanup()
+
