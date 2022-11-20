@@ -49,7 +49,7 @@ def forward(speed, distance, dir, pul,stop_pin):
             print(("limit switch") + str(stop_pin) + (" Hit = ") + str(GPIO.input(stop_pin)))
             return(("False"))
     if(rotations == distance):
-        sleep(1)
+        sleep(0.25)
         return(rotations)
 
 
@@ -71,7 +71,7 @@ def forward_2( speed, distance,dir1, pul1, dir2, pul2, stop_pin):
             print(("limit switch") + str(stop_pin) + (" Hit = ") + str(GPIO.input(stop_pin)))
             return(("False"))
     if(rotations == distance):
-        sleep(1)
+        sleep(0.25)
         return(rotations)
 
 def reverse( speed, distance,dir, pul, stop_pin):
@@ -88,7 +88,7 @@ def reverse( speed, distance,dir, pul, stop_pin):
             print(("limit switch") + str(stop_pin) + (" Hit = ") + str(GPIO.input(stop_pin)))
             return(("False"))
     if(rotations == distance):
-        sleep(1)
+        sleep(0.25)
         return(rotations)
 
 def reverse_2( speed, distance,dir1, pul1, dir2, pul2, stop_pin):
@@ -109,7 +109,7 @@ def reverse_2( speed, distance,dir1, pul1, dir2, pul2, stop_pin):
             print(("limit switch") + str(stop_pin) + (" Hit = ") + str(GPIO.input(stop_pin)))
             return(("False"))
     if(rotations == distance):
-        sleep(1)
+        sleep(0.25)
     return(rotations)
 
 # Begin debug section
@@ -127,7 +127,7 @@ def forward_I(speed, distance, dir, pul):
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
         rotations += 1 # increment rotation
     if(rotations == distance):
-        sleep(1)
+        sleep(0.25)
     return(rotations)
 
 
@@ -147,7 +147,7 @@ def forward_2_I( speed, distance, dir1, pul1, dir2, pul2):
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
         rotations += 1 # increment rotation
     if(rotations == distance):
-        sleep(1)
+        sleep(0.25)
     return(rotations)
 
 def reverse_I(speed, distance, dir, pul):
@@ -162,7 +162,7 @@ def reverse_I(speed, distance, dir, pul):
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
         rotations += 1 # increment rotation
     if(rotations == distance):
-        sleep(1)
+        sleep(0.25)
     return(rotations)
 
 def reverse_2_I( speed, distance, dir1, pul1, dir2, pul2):
@@ -181,7 +181,7 @@ def reverse_2_I( speed, distance, dir1, pul1, dir2, pul2):
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
         rotations += 1 # increment rotation
     if(rotations == distance):
-        sleep(1)
+        sleep(0.25)
     return(rotations)
 
 # End debug section
