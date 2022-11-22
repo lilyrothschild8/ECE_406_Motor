@@ -181,9 +181,9 @@ color: rgb(255,255,255)</string>
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>200</y>
+      <y>195</y>
       <width>71</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
