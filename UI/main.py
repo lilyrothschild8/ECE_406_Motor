@@ -8,7 +8,7 @@ sys.path.append(parent)
 
 import NEMA_Driver as Nema # to use the disable and enable functions easier
 import Main_Program as main # to use the main programs methods
-
+import
 import sqlite3
 from time import sleep
 from PyQt5.uic import*
