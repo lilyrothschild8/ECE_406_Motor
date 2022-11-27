@@ -1,11 +1,21 @@
 import os
 import sys
+
+# set the NEMA driver path to the system
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
+import NEMA_Driver as Nema # to use the disable and enable functions easier
+import Main_Program as main # to use the main programs methods
+
 import sqlite3
 from time import sleep
-from PyQt5.uic import loadUi
+from PyQt5.uic import*
 from PyQt5 import QtWidgets
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QWidget, QStackedWidget
+from PyQt5.QtCore import*
+from PyQt5.QtWidgets import*
+import cv2
 
 db_file_name ="Ford_Data.db"
 db_exist=os.path.exists(db_file_name)
@@ -59,7 +69,7 @@ class Login_Screen_2(QDialog):
                         widget.addWidget(main_screen)
                         widget.setCurrentIndex(widget.currentIndex()+1)
                         widget.setFixedWidth(1000)
-                        widget.setFixedHeight(700)
+                        widget.setFixedHeight(720)
                     else:
                         self.errormessage.setText("Error: incorrect username and password")
                     conn.close()
@@ -115,7 +125,7 @@ class Create_Screen(QDialog):
                 widget.addWidget(main_screen)
                 widget.setCurrentIndex(widget.currentIndex()+1)
                 widget.setFixedWidth(1000)
-                widget.setFixedHeight(700)
+                widget.setFixedHeight(720)
 
         elif (db_exist == False):
             self.errormessage.setText("Error: NULL, create an account")
@@ -130,6 +140,94 @@ class Main_Screen(QMainWindow):
     def __init__(self):
         super(Main_Screen,self).__init__()
         loadUi("Main.ui",self)
+        self.R2_DPWM_Set_Button.clicked.connect(self.Set_R2_DPWM)
+        self.R1_DPWM_Set_Button.clicked.connect(self.Set_R1_DPWM)
+        self.Led_On.clicked.connect(self.TurnLEDOn)
+        self.Led_Off.clicked.connect(self.TurnLEDOff)
+        self.enable_Motors.clicked.connect(self.TurnMotorsOn)
+        self.disable_Motors.clicked.connect(self.TurnMotorsOff)
+        self.Start_Main.clicked.connect(self.Start_Program)
+        self.Stop_Main.clicked.connect(self.Stop_Program)
+        self.increment_X.clicked.connect(self.Increment_X)
+        self.increment_Y.clicked.connect(self.Increment_Y)
+        self.increment_Z.clicked.connect(self.Increment_Z)
+        self.decrement_X.clicked.connect(self.Decrement_X)
+        self.decrement_Y.clicked.connect(self.Decrement_Y)
+        self.decrement_Z.clicked.connect(self.Decrement_Z)
+        self.home_Button.clicked.connect(self.Home_All)
+        self.get_Readings.clicked.connect(self.Get_Reading)
+        self.speed_Slider.valueChanged.connect(self.Set_Speed_Label)
+        self.distance_Slider.valueChanged.connect(self.Set_Distance_Label)
+        
+    def Set_R1_DPWM(self):
+        main.dspwmr1 = self.R1_DPWM_Text_Box.text()
+    def Set_R2_DPWM(self):
+        main.dspwmr2 = self.R2_DPWM_Text_Box.text()
+    def TurnLEDOn(self):
+        main.turn_LED_On()
+        self.LED_Light.setStyleSheet("background-color:rgb(255, 255, 0)")
+        self.LED_Light.setText("ON")
+    def TurnLEDOff(self):
+        main.turn_LED_Off()
+        self.LED_Light.setStyleSheet("background-color:rgb(193, 193, 193)")
+        self.LED_Light.setText("OFF")
+    def TurnMotorsOn(self):
+        main.enable_Motors()
+        self.Motors_Light.setStyleSheet("background-color:rgb(255, 255, 0)")
+        self.Motors_Light.setText("ON")
+    def TurnMotorsOff(self):
+        main.disable_Motors()
+        self.Motors_Light.setStyleSheet("background-color:rgb(193, 193, 193)")
+        self.Motors_Light.setText("OFF")
+    def Start_Program():
+        main.start_Program()
+    def Stop_Program():
+        main.stop_program()
+    def Increment_X(self):
+        speed = self.speed_Slider.value()
+        distance = self.distance_Slider.value()
+        main.set_Speed(speed)
+        main.set_Distance(distance)
+        main.increment_X()
+    def Increment_Y(self):
+        speed = self.speed_Slider.value()
+        distance = self.distance_Slider.value()
+        main.set_Speed(speed)
+        main.set_Distance(distance)
+        main.increment_Y()
+    def Increment_Z(self):
+        speed = self.speed_Slider.value()
+        distance = self.distance_Slider.value()
+        main.set_Speed(speed)
+        main.set_Distance(distance)
+        main.increment_Z()
+    def Decrement_X(self):
+        speed = self.speed_Slider.value()
+        distance = self.distance_Slider.value()
+        main.set_Speed(speed)
+        main.set_Distance(distance)
+        main.decrement_X()
+    def Decrement_Y(self):
+        speed = self.speed_Slider.value()
+        distance = self.distance_Slider.value()
+        main.set_Speed(speed)
+        main.set_Distance(distance)
+        main.decrement_Y()
+    def Decrement_Z(self):
+        speed = self.speed_Slider.value()
+        distance = self.distance_Slider.value()
+        main.set_Speed(speed)
+        main.set_Distance(distance)
+        main.decrement_Z()
+    def Home_All():
+        main.home()
+    def Get_Reading(self):
+        main.get_Reading()
+    def Set_Speed_Label(self):
+        self.Speed_Text.setText("SPD: = " + str(self.speed_Slider.value()))
+    def Set_Distance_Label(self):
+        self.Distance_Text.setText("DST: = " + str(self.distance_Slider.value()))
+    
 
 
 # main
