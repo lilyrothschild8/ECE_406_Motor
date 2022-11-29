@@ -8,7 +8,7 @@ from adafruit_rgb_display import st7735 # the ST7735 library
 # config the CS, DC and Reset pins
 cs_pin = digitalio.DigitalInOut(board.CE0)
 dc_pin = digitalio.DigitalInOut(board.D25)
-reset_pin = digitalio.DigitalInOut(board.D24)
+reset_pin = digitalio.DigitalInOut(board.D12)
 
 # config Baudrate
 BAUDRATE = 24000000
@@ -152,7 +152,7 @@ def Clear_Screen():
 
 def Draw_Main_Menu():
     font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 15)
-    Options = ["Home 1", "Run 2", "Camera 3", "IP Conn 4"]
+    Options = ["Home 1", "Run 2"," ", "IP Conn 3"]
     Label = ["M","E","N","U"]
     image = Image.new("RGB", ((width), (height)))
     image = image.resize((160, 128), Image.BICUBIC)
@@ -179,9 +179,6 @@ def Draw_Main_Menu():
 
 def Home():
     print("Homing")
-
-def Camera_View():
-    print("Loading Camera")
 
 def Run():
     print("Running")

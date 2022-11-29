@@ -107,7 +107,7 @@ while True:
         
     if(char == 'r'):
         #Move the Z axis mototors forward
-        Nema.forward(speed,distance,Motor_Pin[5],Motor_Pin[4],limit_Switches[1])
+        Nema.forward(speed,distance,Motor_Pin[7],Motor_Pin[6],limit_Switches[1])
         # update the new location
         c_Z += distance
         print("moved the Y motors " + str(distance) + " millimeters")
