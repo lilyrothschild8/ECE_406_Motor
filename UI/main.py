@@ -7,6 +7,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 sys.path.append(('../ST7735'))
 
+
 import NEMA_Driver as Nema # to use the disable and enable functions easier
 import Ford_ST7735 as FST7735
 import Main_Program as main # to use the main programs methods
@@ -21,6 +22,7 @@ import cv2
 
 db_file_name ="Ford_Data.db"
 db_exist=os.path.exists(db_file_name)
+
 
 class Login_Screen(QDialog):
     def __init__(self):
@@ -71,7 +73,7 @@ class Login_Screen_2(QDialog):
                         widget.addWidget(main_screen)
                         widget.setCurrentIndex(widget.currentIndex()+1)
                         widget.setFixedWidth(1000)
-                        widget.setFixedHeight(730)
+                        widget.setFixedHeight(760)
                     else:
                         self.errormessage.setText("Error: incorrect username and password")
                     conn.close()
@@ -85,59 +87,6 @@ class Login_Screen_2(QDialog):
         widget.addWidget(previous_screen)
         widget.setCurrentIndex(widget.currentIndex()+1)
 
-class Create_Screen(QDialog):
-    def __init__(self):
-        super(Create_Screen, self).__init__()
-        loadUi("Create.ui", self)
-        self.newPasswordField.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.confirmPassField.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.create.clicked.connect(self.CreateAccount)
-        self.back.clicked.connect(self.GoBack)
-    
-    def CreateAccount(self):
-        newUsername = self.newUsernameField.text()
-        newPassword = self.newPasswordField.text()
-        confirmPassword = self.confirmPassField.text()
-        accessCode = self.newAccessCodeField.text()
-        
-        if db_exist:
-            print("database Exists")
-            if(len(newUsername) == 0 or len(newPassword) == 0 or len(confirmPassword) == 0 or len(accessCode) == 0):
-                self.errormessage.setText("Error: check all input fields")
-            elif newPassword!=confirmPassword:
-                self.errormessage.setText("Error: Passwords are not the same")
-            else:
-                conn = sqlite3.connect(db_file_name)
-                cursor = conn.cursor()
-                query1 = 'SELECT Access_Code FROM Employee WHERE User_Name = \'''Test'"\'"
-                cursor.execute(query1)
-                result_pass1 = cursor.fetchone()
-                if(str(accessCode) == result_pass1[0]):
-                    clearance = 2
-                else:
-                    print(result_pass1[0])
-                    clearance = 1
-                new_info = [newUsername,newPassword,accessCode,clearance]
-                cursor.execute("INSERT INTO Employee VALUES (?,?,?,?)",new_info)
-                conn.commit()
-                conn.close()
-                print("Succesfully created account.")
-                print(clearance)
-                main_screen = Main_Screen()
-                widget.addWidget(main_screen)
-                widget.setCurrentIndex(widget.currentIndex()+1)
-                widget.setFixedWidth(1000)
-                widget.setFixedHeight(700)
-
-        elif (db_exist == False):
-            self.errormessage.setText("Error: NULL, create an account")
-
-
-    def GoBack(self):
-        previous_screen = Login_Screen()
-        widget.addWidget(previous_screen)
-        widget.setCurrentIndex(widget.currentIndex()+1)
-
 class Main_Screen(QMainWindow):
     def __init__(self):
         super(Main_Screen,self).__init__()
@@ -145,13 +94,15 @@ class Main_Screen(QMainWindow):
         self.pasue_Video_Button.clicked.connect(self.Pause_Video)
         self.Worker1 = Worker1()
         self.Worker1.start()
-        self.Worker2 = Worker2()
-        self.Worker2.start()
         self.Worker1.ImageUpdate.connect(self.ImageUpdateSlot)
+        self.UIThread = UIThread()
+        self.UIThread.start()
+        self.MotorThread = MotorThread()
         self.widget.setFixedWidth(1000)
         self.widget.setFixedHeight(750)
         self.show_Run_Button.clicked.connect(self.Show_Run_TFT)
         self.show_IP_Button.clicked.connect(self.Show_IP_TFT)
+        self.show_Camera_Button.clicked.connect(self.Show_Coordinates_TFT)
         self.R2_DPWM_Set_Button.clicked.connect(self.Set_R2_DPWM)
         self.R1_DPWM_Set_Button.clicked.connect(self.Set_R1_DPWM)
         self.Led_On.clicked.connect(self.TurnLEDOn)
@@ -209,56 +160,33 @@ class Main_Screen(QMainWindow):
         self.Motors_Light.setStyleSheet("background-color:rgb(193, 193, 193)")
         self.Motors_Light.setText("OFF")
         
-    def Start_Program():
-        main.start_Program()
+    
+    def Start_Program(self):
+        self.MotorThread.run_Start_Program()
         
-    def Stop_Program():
-        main.stop_program()
+    def Stop_Program(self):
+        self.MotorThread.run_Stop_Program()
         
     def Increment_X(self):
-        speed = self.speed_Slider.value()
-        distance = self.distance_Slider.value()
-        main.set_Speed(speed)
-        main.set_Distance(distance)
-        main.increment_X()
+        main.increment_X(self.speed_Slider.value(),self.distance_Slider.value())
         
     def Increment_Y(self):
-        speed = self.speed_Slider.value()
-        distance = self.distance_Slider.value()
-        main.set_Speed(speed)
-        main.set_Distance(distance)
-        main.increment_Y()
+        main.increment_Y(self.speed_Slider.value(),self.distance_Slider.value())
         
     def Increment_Z(self):
-        speed = self.speed_Slider.value()
-        distance = self.distance_Slider.value()
-        main.set_Speed(speed)
-        main.set_Distance(distance)
-        main.increment_Z()
+        main.increment_Z(self.speed_Slider.value(),self.distance_Slider.value())
         
     def Decrement_X(self):
-        speed = self.speed_Slider.value()
-        distance = self.distance_Slider.value()
-        main.set_Speed(speed)
-        main.set_Distance(distance)
-        main.decrement_X()
+        main.decrement_X(self.speed_Slider.value(),self.distance_Slider.value())
         
     def Decrement_Y(self):
-        speed = self.speed_Slider.value()
-        distance = self.distance_Slider.value()
-        main.set_Speed(speed)
-        main.set_Distance(distance)
-        main.decrement_Y()
+        main.decrement_Y(self.speed_Slider.value(),self.distance_Slider.value())
         
     def Decrement_Z(self):
-        speed = self.speed_Slider.value()
-        distance = self.distance_Slider.value()
-        main.set_Speed(speed)
-        main.set_Distance(distance)
-        main.decrement_Z()
+        main.decrement_Z(self.speed_Slider.value(),self.distance_Slider.value())
         
-    def Home_All():
-        main.home()
+    def Home_All(self):
+        self.MotorThread.run_Home()
         
     def Get_Reading(self):
         main.get_Reading()
@@ -275,19 +203,19 @@ class Main_Screen(QMainWindow):
     def Pause_Video(self):
         self.Worker1.Pause_Video()
     
-    def Show_IP_TFT():
+    def Show_IP_TFT(self):
         FST7735.Check_Info()
     
-    def Show_Run_TFT():
+    def Show_Run_TFT(self):
         FST7735.Run()
         
-    def Show_Home_TFT():
+    def Show_Home_TFT(self):
         FST7735.Home()
     
-    def Show_Menu_TFT():
-        FST7735.Intro()
+    def Show_Coordinates_TFT(self):
+        self.UIThread.show_Coordinates()
         
-    def Show_Main_Menu_TFT():
+    def Show_Main_Menu_TFT(self):
         FST7735.Draw_Main_Menu()
         
 class Worker1(QThread):
@@ -306,13 +234,92 @@ class Worker1(QThread):
     def Pause_Video(self):
         self.quit()
 
-class Worker2(QThread):
+class UIThread(QThread):
     def run(self):
         self.ThreadActive = True
+        FST7735.Configure()
+        main.turn_LCD_On()
         FST7735.Intro()
         FST7735.Draw_Main_Menu()
         self.quit()
+        
+    def show_Coordinates(self):
+        self.ThreadActive = True
+        FST7735.Coordinates(True)
+        self.quit()
+        
+class MotorThread(QThread):
+    def run_Start_Program(self):
+        self.ThreadActive = True
+        FST7735.Run()
+        main.start_Program()
+        self.quit()
+        
+    def run_Stop_Program(self):
+        self.ThreadActive = True
+        FST7735.Draw_Main_Menu()
+        main.stop_program()
+        self.quit()
+        
+    def run_Home(self):
+        self.ThreadActive = True
+        FST7735.Home()
+        main.home()
+        FST7735.Draw_Main_Menu()
+        self.quit()
 
+class Create_Screen(QDialog):
+    def __init__(self):
+        super(Create_Screen, self).__init__()
+        loadUi("Create.ui", self)
+        self.newPasswordField.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.confirmPassField.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.create.clicked.connect(self.CreateAccount)
+        self.back.clicked.connect(self.GoBack)
+    
+    def CreateAccount(self):
+        newUsername = self.newUsernameField.text()
+        newPassword = self.newPasswordField.text()
+        confirmPassword = self.confirmPassField.text()
+        accessCode = self.newAccessCodeField.text()
+        
+        if db_exist:
+            print("database Exists")
+            if(len(newUsername) == 0 or len(newPassword) == 0 or len(confirmPassword) == 0 or len(accessCode) == 0):
+                self.errormessage.setText("Error: check all input fields")
+            elif newPassword!=confirmPassword:
+                self.errormessage.setText("Error: Passwords are not the same")
+            else:
+                conn = sqlite3.connect(db_file_name)
+                cursor = conn.cursor()
+                query1 = 'SELECT Access_Code FROM Employee WHERE User_Name = \'''Test'"\'"
+                cursor.execute(query1)
+                result_pass1 = cursor.fetchone()
+                if(str(accessCode) == result_pass1[0]):
+                    clearance = 2
+                else:
+                    print(result_pass1[0])
+                    clearance = 1
+                new_info = [newUsername,newPassword,accessCode,clearance]
+                cursor.execute("INSERT INTO Employee VALUES (?,?,?,?)",new_info)
+                conn.commit()
+                conn.close()
+                print("Succesfully created account.")
+                print(clearance)
+                main_screen = Main_Screen()
+                widget.addWidget(main_screen)
+                widget.setCurrentIndex(widget.currentIndex()+1)
+                widget.setFixedWidth(1000)
+                widget.setFixedHeight(760)
+
+        elif (db_exist == False):
+            self.errormessage.setText("Error: NULL, create an account")
+
+
+    def GoBack(self):
+        previous_screen = Login_Screen()
+        widget.addWidget(previous_screen)
+        widget.setCurrentIndex(widget.currentIndex()+1)
 
 # main
 app = QApplication(sys.argv)

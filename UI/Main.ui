@@ -141,7 +141,7 @@
       <double>0.000000000000000</double>
      </property>
     </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="progress_Label">
      <property name="geometry">
       <rect>
        <x>590</x>
@@ -1598,7 +1598,7 @@
       <string>Run</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="show_Camera_Button">
+    <widget class="QPushButton" name="show_Coordinates_Button">
      <property name="geometry">
       <rect>
        <x>830</x>
@@ -1613,7 +1613,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Show Camera</string>
+      <string>Show Coordinates</string>
      </property>
     </widget>
     <widget class="QPushButton" name="show_IP_Button">

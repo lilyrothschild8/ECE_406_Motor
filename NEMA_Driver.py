@@ -8,7 +8,7 @@ from time import sleep
 import RPi.GPIO as GPIO
 
 HOME = False
-
+Moving = False
 Enable = 22
 
 small_Amount = 20
@@ -34,8 +34,9 @@ def set_GPIO_In(pin_array):
     for x in pin_array:
         GPIO.setup(x, GPIO.IN, pull_up_down = GPIO.PUD_UP)
         print(("Pin") + (" ") + str(x) + (" ") + ("set as GPIO.IN"))
-
-def forward(speed, distance, dir, pul,stop_pin):
+        
+def forward(speed, distance, dir, pul,stop_pin, Coord):
+    Moving = True
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
     rotations = 0
     GPIO.output(dir, GPIO.HIGH)# set rotation counter clock-wise
@@ -44,16 +45,19 @@ def forward(speed, distance, dir, pul,stop_pin):
         GPIO.output(pul, GPIO.HIGH)
         GPIO.output(pul, GPIO.LOW)
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
-        rotations += 1 # increment rotation
+        rotations -= 1 # increment rotation
+        handle_Coordinate(Coord, rotations)
         if(GPIO.input(stop_pin) == 0):
             print(("limit switch") + str(stop_pin) + (" Hit = ") + str(GPIO.input(stop_pin)))
             return(("False"))
     if(rotations == distance):
+        Moving = False
         sleep(0.25)
         return(rotations)
 
 
-def forward_2( speed, distance,dir1, pul1, dir2, pul2, stop_pin):
+def forward_2( speed, distance,dir1, pul1, dir2, pul2, stop_pin, Coord):
+    Moving = True
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
     rotations = 0
     GPIO.output(dir1, GPIO.HIGH)# set rotation counter clock-wise
@@ -66,15 +70,18 @@ def forward_2( speed, distance,dir1, pul1, dir2, pul2, stop_pin):
         GPIO.output(pul2, GPIO.HIGH)
         GPIO.output(pul2, GPIO.LOW)
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
-        rotations += 1 # increment rotation
+        rotations -= 1 # increment rotation
+        handle_Coordinate(Coord, rotations)
         if(GPIO.input(stop_pin) == 0):
             print(("limit switch") + str(stop_pin) + (" Hit = ") + str(GPIO.input(stop_pin)))
             return(("False"))
     if(rotations == distance):
+        Moving = False
         sleep(0.25)
         return(rotations)
 
-def reverse( speed, distance,dir, pul, stop_pin):
+def reverse( speed, distance,dir, pul, stop_pin, Coord):
+    Moving = True
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
     rotations = 0
     GPIO.output(dir, GPIO.LOW)# set rotation counter clock-wise
@@ -84,14 +91,17 @@ def reverse( speed, distance,dir, pul, stop_pin):
         GPIO.output(pul, GPIO.LOW)
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
         rotations += 1 # increment rotation
+        handle_Coordinate(Coord, rotations)
         if(GPIO.input(stop_pin) == 0):
             print(("limit switch") + str(stop_pin) + (" Hit = ") + str(GPIO.input(stop_pin)))
             return(("False"))
     if(rotations == distance):
+        Moving = False
         sleep(0.25)
         return(rotations)
 
-def reverse_2( speed, distance,dir1, pul1, dir2, pul2, stop_pin):
+def reverse_2( speed, distance,dir1, pul1, dir2, pul2, stop_pin, Coord):
+    Moving = True
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
     rotations = 0
     GPIO.output(dir1, GPIO.LOW)# set rotation counter clock-wise
@@ -105,17 +115,20 @@ def reverse_2( speed, distance,dir1, pul1, dir2, pul2, stop_pin):
         GPIO.output(pul2, GPIO.LOW)
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
         rotations += 1 # increment rotation
+        handle_Coordinate(Coord, rotations)
         if(GPIO.input(stop_pin) == 0):
             print(("limit switch") + str(stop_pin) + (" Hit = ") + str(GPIO.input(stop_pin)))
             return(("False"))
     if(rotations == distance):
+        Moving = False
         sleep(0.25)
     return(rotations)
 
 # Begin debug section
 # The debug section of the methods, these ignore the saftey of the limit switches
 
-def forward_I(speed, distance, dir, pul):
+def forward_I(speed, distance, dir, pul, Coord):
+    Moving = True
     #this method ignores the stop pin status
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
     rotations = 0
@@ -125,13 +138,16 @@ def forward_I(speed, distance, dir, pul):
         GPIO.output(pul, GPIO.HIGH)
         GPIO.output(pul, GPIO.LOW)
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
-        rotations += 1 # increment rotation
+        rotations -= 1 # increment rotation
+        handle_Coordinate(Coord, rotations)
     if(rotations == distance):
+        Moving = False
         sleep(0.25)
     return(rotations)
 
 
-def forward_2_I( speed, distance, dir1, pul1, dir2, pul2):
+def forward_2_I( speed, distance, dir1, pul1, dir2, pul2, Coord):
+    Moving = True
     # this method ignores the stop pin status
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
     rotations = 0
@@ -145,12 +161,15 @@ def forward_2_I( speed, distance, dir1, pul1, dir2, pul2):
         GPIO.output(pul2, GPIO.HIGH)
         GPIO.output(pul2, GPIO.LOW)
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
-        rotations += 1 # increment rotation
+        rotations -= 1 # increment rotation
+        handle_Coordinate(Coord, rotations)
     if(rotations == distance):
+        Moving = False
         sleep(0.25)
     return(rotations)
 
-def reverse_I(speed, distance, dir, pul):
+def reverse_I(speed, distance, dir, pul, Coord):
+    Moving = True
     #this method ignores the stop pin status
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
     rotations = 0
@@ -161,11 +180,14 @@ def reverse_I(speed, distance, dir, pul):
         GPIO.output(pul, GPIO.LOW)
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
         rotations += 1 # increment rotation
+        handle_Coordinate(Coord, rotations)
     if(rotations == distance):
+        Moving = False
         sleep(0.25)
     return(rotations)
 
-def reverse_2_I( speed, distance, dir1, pul1, dir2, pul2):
+def reverse_2_I( speed, distance, dir1, pul1, dir2, pul2, Coord):
+    Moving = True
     # this method ignores the stop pin status
     speed = (speed/1000000)# This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
     rotations = 0
@@ -180,7 +202,9 @@ def reverse_2_I( speed, distance, dir1, pul1, dir2, pul2):
         GPIO.output(pul2, GPIO.LOW)
         sleep(speed) # This is actualy a delay between PUL pulses - effectively sets the mtor rotation speed.
         rotations += 1 # increment rotation
+        handle_Coordinate(Coord, rotations)
     if(rotations == distance):
+        Moving = False
         sleep(0.25)
     return(rotations)
 
@@ -191,20 +215,23 @@ def home_Machine(speed, dir1, pul1, dir2, pul2, dir3, pul3, dir4, pul4, stop_pin
     print("Homing")
     # move Z motor home first
     #forward(speed,100000,dir1,pul1,stop_pin) # Use this when limit_Switch is installed
-    forward(speed,3500,dir4,pul4,stop_pin_Array[0]) # Use this when limit_Switch is not installed
-    reverse_I(900,30,dir4,pul4)
+    forward(speed,3500,dir4,pul4,stop_pin_Array[0],"Z") # Use this when limit_Switch is not installed
+    reverse_I(900,30,dir4,pul4,"Z")
 
     # move X motor home second
     #forward(speed,100000,dir4,pul4,stop_pin)# Use this when limit_Switch is installed
-    forward(speed,6500,dir3,pul3,stop_pin_Array[1]) # Use this when limit_Switch is not installed
-    reverse_I(900,30,dir3,pul3)
+    forward(speed,6500,dir3,pul3,stop_pin_Array[1],"X") # Use this when limit_Switch is not installed
+    reverse_I(900,30,dir3,pul3,"X")
 
     # move Y motors home third
     #forward_2(speed,100000,dir2,pul2,dir3,pul3,stop_pin)# Use this when limit_Switch is installed
-    reverse_2(600,2600,dir1,pul1,dir2,pul2,stop_pin_Array[2])# Use this when limit_Switch is not installed
-    forward_2_I(900,30,dir1,pul1,dir2,pul2)
+    reverse_2(600,2600,dir1,pul1,dir2,pul2,stop_pin_Array[2],"Y")# Use this when limit_Switch is not installed
+    forward_2_I(900,30,dir1,pul1,dir2,pul2,"Y")
 
     HOME = False
+    Camera_X = 0
+    Camera_Y = 0
+    Camera_Z = 0
     print("Finished Homing")
 
 def enable_Motor():
@@ -214,3 +241,24 @@ def enable_Motor():
 def disable_Motor():
     GPIO.output(Enable, GPIO.HIGH) # Enable the motors
     print('Enable set to HIGH - Motors disabled')
+    
+def get_Coordinate(varCoordinate):
+    if(varCoordinate == "X"):
+        return(Camera_X)
+    if(varCoordinate == "Y"):
+        return(Camera_Y)
+    if(varCoordinate == "Z"):
+        return(Camera_Z)
+        
+def handle_Coordinate(varCoord, varRot):
+    Camera_X = 0
+    Camera_Y = 0
+    Camera_Z = 0
+    
+    if(varCoord == "X"):
+        Camera_X += varRot
+    if(varCoord == "Y"):
+        Camera_Y += varRot
+    if(varCoord == "Z"):
+        Camera_Z += varRot
+        

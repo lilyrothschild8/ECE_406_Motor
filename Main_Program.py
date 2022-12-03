@@ -3,7 +3,10 @@
 # This is the main code to run the the test apparatus.
 # 3.3 -> to the controller "+" input for each: ENA, PUL+, and DIR+
 # RASBERRY-PI VERSION
-
+import time
+import digitalio # IO funtionality for the GPIO
+import board # the borad library for using the board definition
+import Ford_ST7735 as FST7735
 # set the NEMA driver path to the system
 import NEMA_Driver as Nema
 # import your modules here
@@ -39,10 +42,7 @@ Nema.Camera_Z  = 0
 
 Motor_Pin = [17, 27, 5, 6, 20, 21, 23, 24, 22, 12] # all the motor and enable pins you want initialized
 limit_Switches = [4, 26, 19] # all the limit switch pins
-ST7735_Pins = [13, 8] # all the st7735 pins to be intialized
-progress_Percentage = 0
-jog_Speed = 0
-jog_Distance = 0
+ST7735_Pin = 13 # The ST7735 pin to be intialized
 
 # use the set_GPIO_Out method to set up GIO outputs
 Nema.set_GPIO_Out(Motor_Pin)
@@ -51,25 +51,25 @@ Nema.set_GPIO_Out(Motor_Pin)
 Nema.set_GPIO_In(limit_Switches)
 
 # use the set_GPIO_In method to set up GIO inputs
-Nema.set_GPIO_Out(ST7735_Pins)
+GPIO.setup(ST7735_Pin, GPIO.OUT)
 
 # Set the ith number in the motor_Pin array as the enable pin correspinding to the real world pin
 Nema.Enable = Motor_Pin[8] # 8 as 22 is the enable pin
 
 def turn_LED_On():
-    GPIO.output(Motor_Pin[9], GPIO.HIGH) # Enable the LED
+    #GPIO.output(Motor_Pin[9], GPIO.HIGH) # Enable the LED
     print('Led turned on')
 
 def turn_LED_Off():
-    GPIO.output(Motor_Pin[9], GPIO.LOW) # Disable the LED
+    #GPIO.output(Motor_Pin[9], GPIO.LOW) # Disable the LED
     print('Led turned off')
     
 def turn_LCD_On():
-    GPIO.output(ST7735_Pins[0], GPIO.HIGH) # Enable the LED
+    GPIO.output(ST7735_Pin, GPIO.HIGH) # Enable the LED
     print('Lcd turned on')
 
 def turn_LCD_Off():
-    GPIO.output(ST7735_Pins[0], GPIO.LOW) # Disable the LED
+    GPIO.output(ST7735_Pin, GPIO.LOW) # Disable the LED
     print('Lcd turned off')
 
 def enable_Motors():
@@ -77,12 +77,6 @@ def enable_Motors():
 
 def disable_Motors():
     Nema.disable_Motor()
-
-def set_Speed(speed):
-    jog_Speed = speed
-
-def set_Distance(distance):
-    jog_Distance = distance
 
 def stop_program():
     Nema.disable_Motor()
@@ -92,84 +86,67 @@ def get_Reading():
 
 def home():
     Nema.home_Machine(600,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],Motor_Pin[5],Motor_Pin[4],Motor_Pin[7],Motor_Pin[6],limit_Switches)
-    Nema.Camera_X = 0
-    Nema.Camera_Y = 0
-    Nema.Camera_Z = 0
 
-def increment_Y():
+def increment_Y(jog_Speed,jog_Distance):
     #Move the Y axis mototors reverse
-    speed = jog_Speed
-    distance = jog_Distance
-    Nema.forward_2(speed,distance,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches[2])
-    # update the new location
-    Nema.Camera_Y += distance
-    print("moved the Y motors " + str(distance) + " millimeters")
+    Nema.forward_2(jog_Speed,jog_Distance,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches[2],"Y")
+    print("moved the Y motors " + str(jog_Distance) + " millimeters")
     
-def decrement_Y():
+def decrement_Y(jog_Speed,jog_Distance):
     #Move the Y axis mototors forward
-    speed = jog_Speed
-    distance = jog_Distance
-    Nema.reverse_2(speed,distance,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches[2])
-    # update the new location
-    Nema.Camera_Y -= distance
-    print("moved the Y motors " + str(distance) + " millimeters")
+    Nema.reverse_2(jog_Speed,jog_Distance,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches[2],"Y")
+    print("moved the Y motors " + str(jog_Distance) + " millimeters")
 
-def increment_X():
+def increment_X(jog_Speed,jog_Distance):
     #Move the X axis mototors reverse
-    speed = jog_Speed
-    distance = jog_Distance
-    Nema.reverse(speed,distance,Motor_Pin[5],Motor_Pin[4],limit_Switches[1])
-    # update the new location
-    Nema.Camera_X += distance
-    print("moved the Y motors " + str(distance) + " millimeters")
+    Nema.reverse(jog_Speed,jog_Distance,Motor_Pin[5],Motor_Pin[4],limit_Switches[1],"X")
+    print("moved the X motors " + str(jog_Distance) + " millimeters")
 
-def decrement_X():
+def decrement_X(jog_Speed,jog_Distance):
     #Move the X axis mototors forward
-    speed = jog_Speed
-    distance = jog_Distance
-    Nema.reverse(speed,distance,Motor_Pin[5],Motor_Pin[4],limit_Switches[1])
-    # update the new location
-    Nema.Camera_X -= distance
-    print("moved the Y motors " + str(distance) + " millimeters")
+    Nema.reverse(jog_Speed,jog_Distance,Motor_Pin[5],Motor_Pin[4],limit_Switches[1],"X")
+    print("moved the X motors " + str(jog_Distance) + " millimeters")
 
-def increment_Z():
+def increment_Z(jog_Speed,jog_Distance):
     #Move the Z axis mototors forward
-    speed = jog_Speed
-    distance = jog_Distance
-    Nema.forward(speed,distance,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
-    # update the new location
-    Nema.Camera_Z += distance
-    print("moved the Y motors " + str(distance) + " millimeters")
+    Nema.forward(jog_Speed,jog_Distance,Motor_Pin[7],Motor_Pin[6],limit_Switches[0],"Z")
+    print("moved the Z motors " + str(jog_Distance) + " millimeters")
 
-def decrement_Z():
+def decrement_Z(jog_Speed,jog_Distance):
     #Move the Z axis mototors reverse
-    speed = jog_Speed
-    distance = jog_Distance
-    Nema.reverse(speed,distance,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
-    # update the new location
-    Nema.Camera_Z -= distance
-    print("moved the Z motors " + str(distance) + " millimeters")
+    Nema.reverse(jog_Speed,jog_Distance,Motor_Pin[7],Motor_Pin[6],limit_Switches[0],"Z")
+    print("moved the Z motors " + str(jog_Distance) + " millimeters")
 
 def show_Intro():
     print("showing Intro")
+    FST7735.Configure()
     FST7735.Intro()
     
 def show_Main_Menu():
     print("showing Main Menu")
+    #FST7735.Configure()
     FST7735.Draw_Main_Menu()
     
 def show_Home():
     print("shwoing Home")
+    #FST7735.Configure()
     FST7735.Home()
     
 def show_Run():
     print("showing Run")
+    #FST7735.Configure()
     FST7735.Run()
     
 def show_IP_Info():
-     print("showing IP info")
-     FST7735.Check_Info()
-     
+    print("showing IP info")
+    #FST7735.Configure()
+    FST7735.Check_Info()
+
+def show_Coordinates():
+    print("showing Coordinates")
+    #FST7735.Configure()
+    FST7735.Coordinates(Nema.Moving)
+    
 def start_Program():
     
     # due to calculations Max speed = 600, Min speed = 900 dont use anything slower or faster for better stability
@@ -180,69 +157,47 @@ def start_Program():
     
     # Home the test bench
     Nema.home_Machine(600,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],Motor_Pin[5],Motor_Pin[4],Motor_Pin[7],Motor_Pin[6],limit_Switches)
-    # Set the camera location as homed
-    Nema.Camera_X = 0
-    Nema.Camera_Y = 0
-    Nema.Camera_Z = 0
     
     # Move Z a camera zoom Length
-    Nema.reverse(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
-    # update the new location
-    Nema.Camera_Z += 3400 #need way to get camera height
+    Nema.reverse(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0],"Z")
     
     # Move X a camera Length
     for y in range(meters_Per_Row):
-        Nema.reverse(900,Water_Meter_Location_1[y],Motor_Pin[5],Motor_Pin[4],limit_Switches[1])
-        # update the new location
-
-        Nema.Camera_X += Water_Meter_Location_1[y]
+        Nema.reverse(900,Water_Meter_Location_1[y],Motor_Pin[5],Motor_Pin[4],limit_Switches[1],"X")
 
         # use camera methods to get the camera reading so the program can continue, append it to a list
         
     # Move Z back a camera zoom Length
-    Nema.forward(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
+    Nema.forward(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0],"Z")
     #Nema.enable_Motor() # re-enable the motors
-    # update the new location
-    Nema.Camera_Z -= 3400
     
     # Move Y the camera to the front row
-    Nema.forward_2(600,2600,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches[2])
+    Nema.forward_2(600,2600,Motor_Pin[1],Motor_Pin[0],Motor_Pin[3],Motor_Pin[2],limit_Switches[2],"Y")
     #Nema.enable_Motor() # re-enable the motors
-    # update the new location
-    Nema.Camera_Y += 2600
+    
     # Move Z a camera zoom Length
-    Nema.reverse(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
+    Nema.reverse(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0],"Z")
     #Nema.enable_Motor() # re-enable the motors
-    # update the new location
-    Nema.Camera_Z += 3400
 
     # use camera methods to get the camera reading so the program can continue, append it to a list
 
     # Move X back a camera Length
     for y in range(meters_Per_Row):
-        Nema.forward(900,Water_Meter_Location_2[y],Motor_Pin[5],Motor_Pin[4],limit_Switches[1])
+        Nema.forward(900,Water_Meter_Location_2[y],Motor_Pin[5],Motor_Pin[4],limit_Switches[1],"X")
         #Nema.enable_Motor() # re-enable the motors
-        # update the new location
-        Nema.Camera_X += Water_Meter_Location_2[y]
 
     # use camera methods to get the camera reading so the program can continue, append it to a list
 
     # Move Z back a camera zoom Length
-    Nema.forward(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
+    Nema.forward(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0],"Z")
     #Nema.enable_Motor() # re-enable the motors
-    # update the new location
-    Nema.Camera_Z -= 3400
     
     # Move X back to orignal location
-    Nema.reverse(900,6500,Motor_Pin[5],Motor_Pin[4],limit_Switches[1])
-    #Nema.enable_Motor() # re-enable the motors
-    Nema.Camera_X -6500
+    Nema.reverse(900,6500,Motor_Pin[5],Motor_Pin[4],limit_Switches[1],"X")
     
     # Move Z back a camera zoom Length
-    Nema.reverse(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0])
+    Nema.reverse(900,3400,Motor_Pin[7],Motor_Pin[6],limit_Switches[0],"Z")
     #Nema.enable_Motor() # re-enable the motors
-    # update the new location
-    Nema.Camera_Z -= 3400
     
     sleep(0.05)
     

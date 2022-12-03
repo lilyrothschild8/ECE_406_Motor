@@ -1,4 +1,13 @@
+import os
+import sys
+
+# set the NEMA driver path to the system
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
 import time
+import NEMA_Driver as nema
 import subprocess
 import digitalio # IO funtionality for the GPIO
 import board # the borad library for using the board definition
@@ -152,7 +161,7 @@ def Clear_Screen():
 
 def Draw_Main_Menu():
     font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 15)
-    Options = ["Home 1", "Run 2"," ", "IP Conn 3"]
+    Options = ["Home 1", "Run 2","Coord 3", "IP Conn 4"]
     Label = ["M","E","N","U"]
     image = Image.new("RGB", ((width), (height)))
     image = image.resize((160, 128), Image.BICUBIC)
@@ -178,37 +187,119 @@ def Draw_Main_Menu():
     disp.image(image)
 
 def Home():
-    print("Homing")
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
+    image = Image.new("RGB", ((width), (height)))
+    image = image.resize((160, 128), Image.BICUBIC)
+    disp.image(image)
+    time.sleep(1.25)
+
+    #Draw Background
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0,0, (160), (128)), outline = 0, fill = (255, 255, 255))
+
+
+    (font_width, font_height) = font.getsize("Homing..")
+    draw.text((width // 2 - font_width // 2, height // 2 - font_height // 2),"Homing..",font=font,fill=(0, 0, 0))
+
+    disp.image(image)
 
 def Run():
-    print("Running")
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
+    image = Image.new("RGB", ((width), (height)))
+    image = image.resize((160, 128), Image.BICUBIC)
+    disp.image(image)
+    time.sleep(1.25)
+
+    #Draw Background
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0,0, (160), (128)), outline = 0, fill = (255, 255, 255))
+
+
+    (font_width, font_height) = font.getsize("Running..")
+    draw.text((width // 2 - font_width // 2, height // 2 - font_height // 2),"Running..",font=font,fill=(0, 0, 0))
+
+    disp.image(image)
 
 def Check_Info():
-    # First define some constants to allow easy positioning of text.
-    padding = -2
-    x = 0
-    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 15)
-    while True:
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 18)
+    # Draw a black filled box to clear the image.
+    image = Image.new("RGB", ((width), (height)))
+    image = image.resize((160, 128), Image.BICUBIC)
+    disp.image(image)
+    
+    time.sleep(1.25)
+    
+    #Draw Background
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0,0, (160), (128)), outline = 0, fill = (255, 255, 255))
+    # Shell scripts for system monitoring from here:
+    # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
+    cmd = "hostname -I | cut -d' ' -f1"
+    IP =  subprocess.check_output(cmd, shell=True).decode("utf-8")
+    
+    #cmd = "cat /sys/class/thermal/thermal_zone0/temp |  awk '{printf \"CPU Temp: %.1f C\", $(NF-0) / 1000}'"  # pylint: disable=line-too-long
+    #Temp = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    
+    (font_width, font_height) = font.getsize("WIFI IP: ")
+    draw.text((width // 2 - font_width // 2, (height/2) // 2 - font_height // 2),"WIFI IP:",font=font,fill=(0, 0, 0))
+    
+    (font_width, font_height) = font.getsize(IP)
+    draw.text((width // 2 - font_width // 2, height // 2 - font_height // 2),(" " + IP),font=font,fill=(0, 0, 0))
+    
+    # Display image.
+    disp.image(image)
+    
+    time.sleep(0.1)
+    
+def Coordinates(moving):
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+    image = Image.new("RGB", ((width), (height)))
+    image = image.resize((160, 128), Image.BICUBIC)
+    disp.image(image)
+    time.sleep(1.25)
+
+    #Draw Background
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0,0, (160), (128)), outline = 0, fill = (255, 255, 255))
+    while moving:
         # Draw a black filled box to clear the image.
-        image = Image.new("RGB", ((width), (height)))
-        draw = ImageDraw.Draw(image)
-        draw.rectangle((0, 0, width, height), outline=0, fill=0)
-
-        # Shell scripts for system monitoring from here:
-        # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-        cmd = "hostname -I | cut -d' ' -f1"
-        IP = "IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
+        draw.rectangle((0, 0, width, height), outline=0, fill=(255,255,255))
+        X = nema.get_Coordinate("X")
+        Y = nema.get_Coordinate("Y")
+        Z = nema.get_Coordinate("Z")
+        (font_width, font_height) = font.getsize("X: "+ str(X))
+        draw.text((width // 2 - font_width // 2, (height/3) // 2 - font_height // 2),"X: " + str(X),font=font,fill=(0, 0, 0))
         
-        cmd = "cat /sys/class/thermal/thermal_zone0/temp |  awk '{printf \"CPU Temp: %.1f C\", $(NF-0) / 1000}'"  # pylint: disable=line-too-long
-        Temp = subprocess.check_output(cmd, shell=True).decode("utf-8")
-
-        # Write four lines of text.
-        y = padding
-        draw.text((x, y), IP, font=font, fill="#FFFFFF")
-        y += font.getsize(IP)[1]
+        (font_width, font_height) = font.getsize("Y: "+ str(Y))
+        draw.text((width // 2 - font_width // 2, (height) // 2 - font_height // 2),"Y: " + str(Y),font=font,fill=(0, 0, 0))
         
-        draw.text((x, y), Temp, font=font, fill="#FF00FF")
+        (font_width, font_height) = font.getsize("Z: "+ str(Z))
+        draw.text((width // 2 - font_width // 2, (height*1.6) // 2 - font_height // 2),"Z: " + str(Z),font=font,fill=(0, 0, 0))
 
-        # Display image.
         disp.image(image)
         time.sleep(0.1)
+def Configure():
+    # config the CS, DC and Reset pins
+    cs_pin = digitalio.DigitalInOut(board.CE0)
+    dc_pin = digitalio.DigitalInOut(board.D25)
+    reset_pin = digitalio.DigitalInOut(board.D12)
+
+    # config Baudrate
+    BAUDRATE = 24000000
+    x = "NULL"
+    # Setup SPI bus using hardware SPI
+    spi = board.SPI()
+
+    # Load a TTF Font
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 22)
+
+    # setup the display
+    disp = st7735.ST7735R(spi, rotation = 90, height = 160, x_offset = 0, y_offset = 0, cs=cs_pin,dc=dc_pin)
+
+    # autoscale the image with RGB full color
+    if disp.rotation % 180 == 90:
+        height = disp.width # we swap height and width to rotate it to landscape.
+        width = disp.height
+    else:
+        width = disp.width
+        height = disp.height
